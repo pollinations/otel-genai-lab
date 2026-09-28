@@ -22,6 +22,18 @@ This is an independent Pollinations project. It is not an official OpenTelemetry
 - Keep prompts, responses, credentials, and raw authorization data out of telemetry by default.
 - Support claims with at least two gateway implementations before proposing portable semantics.
 
+## Development
+
+Use Node.js 24.21.0 and npm 11.19.0:
+
+```sh
+npm ci
+npm run check
+npm run build
+```
+
+The synchronous gateway simulator currently covers direct success, fallback success, exhausted fallback, and terminal errors. Start the pinned OpenTelemetry Collector with `docker compose up collector` when working on OTLP export; it accepts OTLP/gRPC on port 4317 and OTLP/HTTP on port 4318.
+
 ## License
 
 [MIT](LICENSE)

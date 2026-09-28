@@ -1,0 +1,34 @@
+{
+  "name": "@pollinations/otel-genai-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic reference lab for OpenTelemetry traces from GenAI gateways",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "packageManager": "npm@11.19.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "npm run format:check && npm run typecheck && npm test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/exporter-trace-otlp-http": "0.222.0",
+    "@opentelemetry/resources": "2.11.0",
+    "@opentelemetry/sdk-trace-node": "2.11.0",
+    "@opentelemetry/semantic-conventions": "1.43.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vitest": "5.0.2"
+  },
+  "license": "MIT"
+}
