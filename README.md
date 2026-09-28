@@ -6,11 +6,11 @@ The project starts with a question rather than a new convention:
 
 > How should an OpenTelemetry trace represent one server-side GenAI gateway operation and its provider attempts when routing, fallback, caching, deduplication, or detached execution occurs, while keeping latency and usage attribution accurate and excluding prompt and response content by default?
 
-Read the [project proposal](docs/project-proposal.md), [scenario contract](docs/scenarios.md), [experimental telemetry model](docs/telemetry-model.md), [validation policy](docs/validation.md), [agentgateway comparison](docs/research/agentgateway-comparison.md), and [project tracker](https://github.com/pollinations/otel-genai-lab/issues/10).
+Read the [project proposal](docs/project-proposal.md), [scenario contract](docs/scenarios.md), [experimental telemetry model](docs/telemetry-model.md), [extended scenarios](docs/extended-scenarios.md), [validation policy](docs/validation.md), [agentgateway comparison](docs/research/agentgateway-comparison.md), and [project tracker](https://github.com/pollinations/otel-genai-lab/issues/10).
 
 ## Current phase
 
-The project is in Gate 1: upstream alignment and cross-implementation research. The question is connected to [OpenTelemetry GenAI semantic conventions #231](https://github.com/open-telemetry/semantic-conventions-genai/issues/231#issuecomment-5863653044).
+The project is building Gate 2: the portable reference lab. Its telemetry mapping remains experimental pending upstream feedback on [OpenTelemetry GenAI semantic conventions #231](https://github.com/open-telemetry/semantic-conventions-genai/issues/231#issuecomment-5863653044).
 
 This is an independent Pollinations project. It is not an official OpenTelemetry conformance suite and does not imply CNCF or LFX endorsement.
 
@@ -32,7 +32,7 @@ npm run check
 npm run build
 ```
 
-The synchronous gateway simulator currently covers direct success, fallback success, exhausted fallback, and terminal errors. Start the pinned OpenTelemetry Collector with `docker compose up collector` when working on OTLP export; it accepts OTLP/gRPC on port 4317 and OTLP/HTTP on port 4318.
+The lab covers direct success, fallback, terminal failure, cache hits, concurrent deduplication, and detached completion. Start the pinned OpenTelemetry Collector with `docker compose up collector` when working on OTLP export; it accepts OTLP/gRPC on port 4317 and OTLP/HTTP on port 4318.
 
 ## License
 

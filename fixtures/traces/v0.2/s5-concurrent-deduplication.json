@@ -1,0 +1,78 @@
+{
+  "fixtureVersion": "0.2.0",
+  "sourceScenario": "s5-concurrent-deduplication",
+  "semanticConventionSchemaUrl": "https://opentelemetry.io/schemas/gen-ai-dev/1.42.0-dev",
+  "mappingStatus": "experimental",
+  "metricAccountingGuarantee": "not_asserted",
+  "spans": [
+    {
+      "id": "observation-1",
+      "trace": "trace-1",
+      "parent": null,
+      "links": [],
+      "name": "POST /v1/chat/completions",
+      "kind": "SERVER",
+      "status": "UNSET",
+      "startOffsetMs": 0,
+      "durationMs": 60,
+      "attributes": {
+        "http.request.method": "POST",
+        "http.route": "/v1/chat/completions",
+        "otel_genai_lab.observation.type": "generated_result",
+        "server.address": "genai-gateway.local"
+      }
+    },
+    {
+      "id": "generation",
+      "trace": "trace-1",
+      "parent": "observation-1",
+      "links": [],
+      "name": "execute generation",
+      "kind": "INTERNAL",
+      "status": "UNSET",
+      "startOffsetMs": 0,
+      "durationMs": 60,
+      "attributes": {
+        "otel_genai_lab.generation.execution": "shared"
+      }
+    },
+    {
+      "id": "attempt-1",
+      "trace": "trace-1",
+      "parent": "generation",
+      "links": [],
+      "name": "chat alpha/model-a",
+      "kind": "CLIENT",
+      "status": "UNSET",
+      "startOffsetMs": 0,
+      "durationMs": 60,
+      "attributes": {
+        "gen_ai.operation.name": "chat",
+        "gen_ai.provider.name": "alpha",
+        "gen_ai.request.model": "alpha/model-a",
+        "gen_ai.response.model": "alpha/model-a",
+        "gen_ai.usage.input_tokens": 10,
+        "gen_ai.usage.output_tokens": 4
+      }
+    },
+    {
+      "id": "observation-2",
+      "trace": "trace-2",
+      "parent": null,
+      "links": [
+        "generation"
+      ],
+      "name": "POST /v1/chat/completions",
+      "kind": "SERVER",
+      "status": "UNSET",
+      "startOffsetMs": 10,
+      "durationMs": 50,
+      "attributes": {
+        "http.request.method": "POST",
+        "http.route": "/v1/chat/completions",
+        "otel_genai_lab.observation.type": "generated_result",
+        "server.address": "genai-gateway.local"
+      }
+    }
+  ]
+}
