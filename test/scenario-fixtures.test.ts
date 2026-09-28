@@ -6,33 +6,9 @@ import { Ajv2020 } from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
 import {
-  executeGatewayRequest,
-  ScriptedProvider,
-  type ProviderOutcome,
-  type Usage,
-} from "../src/gateway.js";
-
-interface ScenarioFixture {
-  schemaVersion: "0.1.0";
-  id: string;
-  summary: string;
-  request: { requestedModel: string };
-  candidates: Array<{
-    provider: string;
-    resolvedModel: string;
-    outcome: ProviderOutcome;
-  }>;
-  expected: {
-    result: "success" | "failure";
-    logicalOperations: 1;
-    generations: 1;
-    providerAttempts: number;
-    attemptOrder: string[];
-    usageObservations: number;
-    authoritativeUsage?: Usage;
-    errorType?: string;
-  };
-}
+  executeScenarioFixture,
+  type ScenarioFixture,
+} from "../src/scenario.js";
 
 const fixtureDirectory = fileURLToPath(
   new URL("../fixtures/scenarios/v0.1/", import.meta.url),
@@ -87,12 +63,7 @@ describe("synchronous scenario fixtures", () => {
         true,
       );
       const fixture = value as ScenarioFixture;
-
-      const candidates = fixture.candidates.map((candidate) => ({
-        provider: new ScriptedProvider(candidate.provider, [candidate.outcome]),
-        resolvedModel: candidate.resolvedModel,
-      }));
-      const result = executeGatewayRequest(fixture.request, candidates);
+      const result = executeScenarioFixture(fixture);
 
       expect(result.type).toBe(fixture.expected.result);
       expect(result.attempts).toHaveLength(fixture.expected.providerAttempts);

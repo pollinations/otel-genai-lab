@@ -10,12 +10,15 @@
   "packageManager": "npm@11.19.0",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "check": "npm run format:check && npm run typecheck && npm test",
+    "check": "npm run format:check && npm run typecheck && npm test && npm run traces:check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "fixtures:check": "vitest run test/scenario-fixtures.test.ts"
+    "fixtures:check": "vitest run test/scenario-fixtures.test.ts",
+    "traces:generate": "tsx scripts/generate-traces.ts",
+    "traces:check": "tsx scripts/generate-traces.ts --check",
+    "traces:export": "tsx scripts/export-traces.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.1",

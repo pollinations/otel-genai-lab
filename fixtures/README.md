@@ -14,6 +14,8 @@ The JSON Schema at `scenarios/v0.1/schema.json` is authoritative for fixture str
 
 Run `npm run fixtures:check` to validate the schema and execute every fixture.
 
+`traces/v0.1/` contains the canonical projection generated from those scenarios. It removes random IDs and absolute timestamps while retaining span topology, timing, status, and attributes. Run `npm run traces:generate` after an intentional telemetry change and `npm run traces:check` to detect drift.
+
 ## Privacy
 
 Fixtures contain model aliases, provider aliases, deterministic durations, error categories, and token counts. Prompt content, generated content, credentials, authorization values, and raw request URLs are outside the schema.
