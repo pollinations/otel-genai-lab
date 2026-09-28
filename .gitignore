@@ -6,3 +6,4 @@ coverage/
 !.env.example
 *.log
 .issue-drafts/
+tmp/

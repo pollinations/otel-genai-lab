@@ -1,0 +1,6 @@
+.issue-drafts/
+coverage/
+dist/
+node_modules/
+otel-genai-lab-session-handoff.md
+tmp/
