@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "0.2.0",
+  "id": "s4-cache-hit",
+  "summary": "A cached result is observed without starting a generation or provider call.",
+  "mode": "cache_hit",
+  "request": { "requestedModel": "model-a" },
+  "observations": [
+    {
+      "id": "observation-1",
+      "role": "request",
+      "outcome": "cache_hit",
+      "startOffsetMs": 0,
+      "durationMs": 5
+    }
+  ],
+  "expected": {
+    "logicalOperations": 1,
+    "generations": 0,
+    "providerAttempts": 0,
+    "resultObservations": 1,
+    "usageOwners": 0,
+    "continuity": "none",
+    "metricAccountingGuarantee": "not_asserted"
+  }
+}

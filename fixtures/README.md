@@ -16,6 +16,10 @@ Run `npm run fixtures:check` to validate the schema and execute every fixture.
 
 `traces/v0.1/` contains the canonical projection generated from those scenarios. It removes random IDs and absolute timestamps while retaining span topology, timing, status, and attributes. Run `npm run traces:generate` after an intentional telemetry change and `npm run traces:check` to detect drift. The focused invalid fixtures under `traces/invalid/v0.1/` prove that each validator policy fails with an actionable span and field.
 
+## Extended scenarios
+
+`scenarios/v0.2/` and `traces/v0.2/` cover cache hits, concurrent deduplication, and detached completion. This version adds multiple observations, optional generation work, normalized trace membership, and span links. Its `metricAccountingGuarantee` stays `not_asserted` because trace fixtures cannot promise exactly-once metric delivery.
+
 ## Privacy
 
 Fixtures contain model aliases, provider aliases, deterministic durations, error categories, and token counts. Prompt content, generated content, credentials, authorization values, and raw request URLs are outside the schema.

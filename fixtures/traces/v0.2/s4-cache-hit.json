@@ -1,0 +1,26 @@
+{
+  "fixtureVersion": "0.2.0",
+  "sourceScenario": "s4-cache-hit",
+  "semanticConventionSchemaUrl": "https://opentelemetry.io/schemas/gen-ai-dev/1.42.0-dev",
+  "mappingStatus": "experimental",
+  "metricAccountingGuarantee": "not_asserted",
+  "spans": [
+    {
+      "id": "observation-1",
+      "trace": "trace-1",
+      "parent": null,
+      "links": [],
+      "name": "POST /v1/chat/completions",
+      "kind": "SERVER",
+      "status": "UNSET",
+      "startOffsetMs": 0,
+      "durationMs": 5,
+      "attributes": {
+        "http.request.method": "POST",
+        "http.route": "/v1/chat/completions",
+        "otel_genai_lab.observation.type": "cache_hit",
+        "server.address": "genai-gateway.local"
+      }
+    }
+  ]
+}

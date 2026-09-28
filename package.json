@@ -16,8 +16,8 @@
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "fixtures:check": "vitest run test/scenario-fixtures.test.ts",
-    "traces:generate": "tsx scripts/generate-traces.ts",
-    "traces:check": "tsx scripts/generate-traces.ts --check",
+    "traces:generate": "tsx scripts/generate-traces.ts && tsx scripts/generate-extended-traces.ts",
+    "traces:check": "tsx scripts/generate-traces.ts --check && tsx scripts/generate-extended-traces.ts --check",
     "traces:export": "tsx scripts/export-traces.ts",
     "traces:validate": "tsx scripts/validate-traces.ts"
   },

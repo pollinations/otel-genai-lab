@@ -1,11 +1,13 @@
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 
+import { loadExtendedScenarioFixtures } from "./extended-scenarios.js";
+import { loadScenarioFixtures } from "./scenarios.js";
+import { recordExtendedScenario } from "../src/extended-telemetry.js";
 import {
   createTracerProvider,
   GEN_AI_SCHEMA_URL,
   recordScenario,
 } from "../src/telemetry.js";
-import { loadScenarioFixtures } from "./scenarios.js";
 
 const exporter = new OTLPTraceExporter({
   url:
@@ -13,12 +15,18 @@ const exporter = new OTLPTraceExporter({
     "http://localhost:4318/v1/traces",
 });
 const provider = createTracerProvider(exporter);
-const tracer = provider.getTracer("otel-genai-lab", "0.1.0", {
+const synchronousTracer = provider.getTracer("otel-genai-lab", "0.1.0", {
+  schemaUrl: GEN_AI_SCHEMA_URL,
+});
+const extendedTracer = provider.getTracer("otel-genai-lab", "0.2.0", {
   schemaUrl: GEN_AI_SCHEMA_URL,
 });
 
 for (const fixture of loadScenarioFixtures()) {
-  recordScenario(fixture, tracer, Date.now());
+  recordScenario(fixture, synchronousTracer, Date.now());
+}
+for (const fixture of loadExtendedScenarioFixtures()) {
+  recordExtendedScenario(fixture, extendedTracer, Date.now() - 1_000);
 }
 
 await provider.forceFlush();
