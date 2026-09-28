@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "s2-fallback-success",
+  "summary": "A retryable primary failure is followed by a successful fallback.",
+  "request": { "requestedModel": "model-a" },
+  "candidates": [
+    {
+      "provider": "alpha",
+      "resolvedModel": "alpha/model-a",
+      "outcome": {
+        "type": "failure",
+        "durationMs": 20,
+        "errorType": "upstream_unavailable",
+        "retryable": true
+      }
+    },
+    {
+      "provider": "beta",
+      "resolvedModel": "beta/model-b",
+      "outcome": {
+        "type": "success",
+        "durationMs": 40,
+        "usage": { "inputTokens": 10, "outputTokens": 4 }
+      }
+    }
+  ],
+  "expected": {
+    "result": "success",
+    "logicalOperations": 1,
+    "generations": 1,
+    "providerAttempts": 2,
+    "attemptOrder": ["alpha", "beta"],
+    "usageObservations": 1,
+    "authoritativeUsage": { "inputTokens": 10, "outputTokens": 4 }
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pollinations/otel-genai-lab/fixtures/scenarios/v0.1/schema.json",
+  "title": "Synchronous GenAI gateway scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "summary",
+    "request",
+    "candidates",
+    "expected"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^s[1-9][0-9]*-[a-z0-9-]+$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestedModel"],
+      "properties": {
+        "requestedModel": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/candidate"
+      }
+    },
+    "expected": {
+      "$ref": "#/$defs/expected"
+    }
+  },
+  "$defs": {
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputTokens", "outputTokens"],
+      "properties": {
+        "inputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "successOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "durationMs", "usage"],
+      "properties": {
+        "type": {
+          "const": "success"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "usage": {
+          "$ref": "#/$defs/usage"
+        }
+      }
+    },
+    "failureOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "durationMs", "errorType", "retryable"],
+      "properties": {
+        "type": {
+          "const": "failure"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errorType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "resolvedModel", "outcome"],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolvedModel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/successOutcome"
+            },
+            {
+              "$ref": "#/$defs/failureOutcome"
+            }
+          ]
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "logicalOperations",
+        "generations",
+        "providerAttempts",
+        "attemptOrder",
+        "usageObservations"
+      ],
+      "properties": {
+        "result": {
+          "enum": ["success", "failure"]
+        },
+        "logicalOperations": {
+          "const": 1
+        },
+        "generations": {
+          "const": 1
+        },
+        "providerAttempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attemptOrder": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "usageObservations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "authoritativeUsage": {
+          "$ref": "#/$defs/usage"
+        },
+        "errorType": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "result": {
+                "const": "success"
+              }
+            }
+          },
+          "then": {
+            "required": ["authoritativeUsage"],
+            "properties": {
+              "usageObservations": {
+                "const": 1
+              },
+              "authoritativeUsage": {
+                "$ref": "#/$defs/usage"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result": {
+                "const": "failure"
+              }
+            }
+          },
+          "then": {
+            "required": ["errorType"],
+            "properties": {
+              "usageObservations": {
+                "const": 0
+              },
+              "errorType": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
