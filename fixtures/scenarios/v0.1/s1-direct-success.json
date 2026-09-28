@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "s1-direct-success",
+  "summary": "The first provider succeeds and returns authoritative usage.",
+  "request": { "requestedModel": "model-a" },
+  "candidates": [
+    {
+      "provider": "alpha",
+      "resolvedModel": "alpha/model-a",
+      "outcome": {
+        "type": "success",
+        "durationMs": 40,
+        "usage": { "inputTokens": 10, "outputTokens": 4 }
+      }
+    }
+  ],
+  "expected": {
+    "result": "success",
+    "logicalOperations": 1,
+    "generations": 1,
+    "providerAttempts": 1,
+    "attemptOrder": ["alpha"],
+    "usageObservations": 1,
+    "authoritativeUsage": { "inputTokens": 10, "outputTokens": 4 }
+  }
+}

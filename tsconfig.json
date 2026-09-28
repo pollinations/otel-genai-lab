@@ -15,7 +15,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2024",
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

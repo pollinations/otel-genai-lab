@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "fixtures:check": "vitest run test/scenario-fixtures.test.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.1",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "24.10.1",
+    "ajv": "^8.20.0",
     "prettier": "3.9.9",
     "tsx": "4.23.15",
     "typescript": "7.0.2",

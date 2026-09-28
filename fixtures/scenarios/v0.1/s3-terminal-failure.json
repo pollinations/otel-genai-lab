@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "s3-terminal-failure",
+  "summary": "All retryable provider candidates fail and no usage is fabricated.",
+  "request": { "requestedModel": "model-a" },
+  "candidates": [
+    {
+      "provider": "alpha",
+      "resolvedModel": "alpha/model-a",
+      "outcome": {
+        "type": "failure",
+        "durationMs": 20,
+        "errorType": "upstream_unavailable",
+        "retryable": true
+      }
+    },
+    {
+      "provider": "beta",
+      "resolvedModel": "beta/model-b",
+      "outcome": {
+        "type": "failure",
+        "durationMs": 40,
+        "errorType": "upstream_timeout",
+        "retryable": true
+      }
+    }
+  ],
+  "expected": {
+    "result": "failure",
+    "logicalOperations": 1,
+    "generations": 1,
+    "providerAttempts": 2,
+    "attemptOrder": ["alpha", "beta"],
+    "usageObservations": 0,
+    "errorType": "upstream_timeout"
+  }
+}
