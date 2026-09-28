@@ -1,0 +1,54 @@
+{
+  "fixtureVersion": "0.1.0",
+  "sourceScenario": "s2-fallback-success",
+  "semanticConventionSchemaUrl": "https://opentelemetry.io/schemas/gen-ai-dev/1.42.0-dev",
+  "mappingStatus": "experimental",
+  "spans": [
+    {
+      "id": "gateway",
+      "parent": null,
+      "name": "POST /v1/chat/completions",
+      "kind": "SERVER",
+      "status": "UNSET",
+      "startOffsetMs": 0,
+      "durationMs": 60,
+      "attributes": {
+        "http.request.method": "POST",
+        "http.route": "/v1/chat/completions",
+        "server.address": "genai-gateway.local"
+      }
+    },
+    {
+      "id": "attempt-1",
+      "parent": "attempt-2",
+      "name": "chat alpha/model-a",
+      "kind": "CLIENT",
+      "status": "ERROR",
+      "startOffsetMs": 0,
+      "durationMs": 20,
+      "attributes": {
+        "error.type": "upstream_unavailable",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.provider.name": "alpha",
+        "gen_ai.request.model": "alpha/model-a"
+      }
+    },
+    {
+      "id": "attempt-2",
+      "parent": "gateway",
+      "name": "chat beta/model-b",
+      "kind": "CLIENT",
+      "status": "UNSET",
+      "startOffsetMs": 20,
+      "durationMs": 40,
+      "attributes": {
+        "gen_ai.operation.name": "chat",
+        "gen_ai.provider.name": "beta",
+        "gen_ai.request.model": "beta/model-b",
+        "gen_ai.response.model": "beta/model-b",
+        "gen_ai.usage.input_tokens": 10,
+        "gen_ai.usage.output_tokens": 4
+      }
+    }
+  ]
+}
