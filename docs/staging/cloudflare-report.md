@@ -1,18 +1,30 @@
 # Cloudflare staging evidence report
 
-Status: **awaiting credentialed staging run**
+Status: **smoke run captured; trace inspection pending**
 
 This report records the bounded experiment from `staging/cloudflare`. Do not add prompts, responses, authorization values, destination credentials, full Durable Object identifiers, or raw request URLs to this file.
 
 ## Run metadata
 
-| Field                                | Value                              |
-| ------------------------------------ | ---------------------------------- |
-| Date and Worker version              | Pending                            |
-| Wrangler version                     | 4.145.0                            |
-| Compatibility date                   | 2026-09-30                         |
-| Trace sampling                       | 100% for three controlled requests |
-| Trace persistence/export destination | Pending                            |
+| Field                                | Value                                                      |
+| ------------------------------------ | ---------------------------------------------------------- |
+| Date captured                        | 2026-09-30 17:09:49 UTC                                    |
+| Worker host                          | `otel-genai-lab-staging.ayushbhatt633.workers.dev`         |
+| Source revision                      | `56bd52e`                                                  |
+| Wrangler version                     | 4.145.0                                                    |
+| Compatibility date                   | 2026-09-30                                                 |
+| Trace sampling                       | 100% for three controlled requests                         |
+| Trace persistence/export destination | Cloudflare persistence enabled; external export not tested |
+
+## Smoke result
+
+| Scenario             | HTTP status | Client duration | Response              |
+| -------------------- | ----------- | --------------- | --------------------- |
+| Direct success       | 200         | 369.87 ms       | `success`, 1 attempt  |
+| Fallback success     | 200         | 58.40 ms        | `success`, 2 attempts |
+| Durable Object alarm | 202         | 945.70 ms       | `scheduled`           |
+
+These client durations confirm route behavior only. They are not instrumentation overhead measurements and cannot replace the platform wall-time and CPU-time review below.
 
 ## Scenario evidence
 
