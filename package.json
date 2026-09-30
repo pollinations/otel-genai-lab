@@ -10,7 +10,7 @@
   "packageManager": "npm@11.19.0",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "check": "npm run format:check && npm run typecheck && npm test && npm run traces:check && npm run traces:validate",
+    "check": "npm run format:check && npm run typecheck && npm test && npm run traces:check && npm run traces:validate && npm run staging:check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
@@ -19,7 +19,11 @@
     "traces:generate": "tsx scripts/generate-traces.ts && tsx scripts/generate-extended-traces.ts",
     "traces:check": "tsx scripts/generate-traces.ts --check && tsx scripts/generate-extended-traces.ts --check",
     "traces:export": "tsx scripts/export-traces.ts",
-    "traces:validate": "tsx scripts/validate-traces.ts"
+    "traces:validate": "tsx scripts/validate-traces.ts",
+    "staging:typecheck": "tsc -p staging/cloudflare/tsconfig.json",
+    "staging:check": "npm run staging:typecheck && wrangler deploy --dry-run --config staging/cloudflare/wrangler.jsonc",
+    "staging:dev": "wrangler dev --config staging/cloudflare/wrangler.jsonc",
+    "staging:smoke": "tsx scripts/cloudflare-smoke.ts"
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.1",
@@ -29,12 +33,14 @@
     "@opentelemetry/semantic-conventions": "1.43.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260930.2",
     "@types/node": "24.10.1",
     "ajv": "^8.20.0",
     "prettier": "3.9.9",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vitest": "5.0.2"
+    "vitest": "5.0.2",
+    "wrangler": "^4.145.0"
   },
   "license": "MIT"
 }

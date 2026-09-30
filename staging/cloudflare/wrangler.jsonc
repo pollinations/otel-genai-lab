@@ -1,0 +1,30 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "otel-genai-lab-staging",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-30",
+  "observability": {
+    "logs": {
+      "enabled": false,
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+    },
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "GENERATION",
+        "class_name": "GenerationCoordinator",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["GenerationCoordinator"],
+    },
+  ],
+}
