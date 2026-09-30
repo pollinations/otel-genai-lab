@@ -7,6 +7,7 @@ import {
   successAttributes,
   type ProviderStep,
 } from "./policy.js";
+import { previewResponse } from "./preview.js";
 
 interface Env {
   GENERATION: DurableObjectNamespace<GenerationCoordinator>;
@@ -17,6 +18,10 @@ const jsonHeaders = { "content-type": "application/json" };
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/") {
+      return previewResponse();
+    }
+
     if (url.pathname.startsWith("/__provider/")) {
       return new Response(null, { status: 204 });
     }
