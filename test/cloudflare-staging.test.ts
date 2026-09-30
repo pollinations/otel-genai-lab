@@ -10,6 +10,10 @@ import {
   scenarioFromPath,
   successAttributes,
 } from "../staging/cloudflare/src/policy.js";
+import {
+  previewDocument,
+  previewResponse,
+} from "../staging/cloudflare/src/preview.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 
@@ -78,5 +82,36 @@ describe("Cloudflare staging policy", () => {
     expect(config.observability.traces).toEqual(
       expect.objectContaining({ enabled: true, head_sampling_rate: 1 }),
     );
+  });
+});
+
+describe("Cloudflare staging preview", () => {
+  it("offers only the three bounded synthetic scenarios", () => {
+    expect(previewDocument).toContain(
+      'const scenarios = ["direct", "fallback", "detached"]',
+    );
+    expect(previewDocument.match(/<button[^>]+data-run=/g)).toHaveLength(3);
+    expect(previewDocument).toContain("No model is called");
+  });
+
+  it("does not collect content or load third-party resources", () => {
+    expect(previewDocument).not.toMatch(/<(?:form|input|textarea)\b/i);
+    expect(previewDocument).not.toMatch(/(?:src|href)=["']https?:\/\//i);
+    expect(previewDocument).not.toMatch(/request\.(?:json|text|formData)/);
+  });
+
+  it("serves restrictive browser security headers", () => {
+    const response = previewResponse();
+    expect(response.headers.get("content-type")).toBe(
+      "text/html; charset=utf-8",
+    );
+    expect(response.headers.get("content-security-policy")).toContain(
+      "connect-src 'self'",
+    );
+    expect(response.headers.get("content-security-policy")).toContain(
+      "frame-ancestors 'none'",
+    );
+    expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
   });
 });
