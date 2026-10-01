@@ -73,7 +73,15 @@ Cache hits, caller deduplication, and detached execution form a second layer. Th
 
 Issue [#31](https://github.com/pollinations/otel-genai-lab/issues/31) adds an opt-in runtime harness for `ghcr.io/agentgateway/agentgateway:v1.5.0`. It uses a deterministic local OpenAI-compatible provider on Node.js `24.15.0-alpine`, exports OTLP/HTTP protobuf through Collector `0.161.0`, and retains Collector JSON only under the ignored `tmp/` directory. The Compose profile pins all three image indexes by digest.
 
-The harness sends one direct success and one deterministic provider error, with prompt and response capture disabled. The `inspect` command retains only the bounded GenAI operation, provider, model, usage, and HTTP outcome fields needed for comparison; it reports `agw.*` and `agentgateway.*` attribute names separately and applies the lab's privacy and attribute-safety checks. Runtime conclusions will be recorded here after the first reproducible capture rather than inferred from configuration.
+The harness sends one direct success and one deterministic provider error, with prompt and response capture disabled. The `inspect` command retains only the bounded GenAI operation, provider, model, usage, and HTTP outcome fields needed for comparison; it reports `agw.*` and `agentgateway.*` attribute names separately and applies the lab's privacy and attribute-safety checks.
+
+### Runtime result
+
+The 2026-10-01 capture produced two traces and four spans with no safety findings. The normalized, identifier-free evidence is committed at [`fixtures/interop/agentgateway-v1.5.0.json`](../../fixtures/interop/agentgateway-v1.5.0.json).
+
+Agentgateway v1.5.0 puts the standard GenAI operation, provider, model, and successful usage fields on the inbound `SERVER` span. Its outbound provider call is a child HTTP `CLIENT` span with `agentgateway.outbound.*` classification but no `gen_ai.*` fields. Both spans retain the provider HTTP outcome (`200` or `503`), while their OpenTelemetry span status remains `UNSET`.
+
+This confirms that the shared behavioral concepts exist but the emitted topology is not the lab's proposed one-GenAI-client-span-per-provider-attempt baseline. In particular, the direct and failed provider calls are visible, but attempt-level GenAI identity and usage are not attached to the client spans. A multi-provider fallback capture remains necessary to determine whether separate failed and successful HTTP client spans survive under one gateway server span.
 
 ## Consequences for implementation
 

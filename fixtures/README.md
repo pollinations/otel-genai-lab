@@ -20,6 +20,10 @@ Run `npm run fixtures:check` to validate the schema and execute every fixture.
 
 `scenarios/v0.2/` and `traces/v0.2/` cover cache hits, concurrent deduplication, and detached completion. This version adds multiple observations, optional generation work, normalized trace membership, and span links. Its `metricAccountingGuarantee` stays `not_asserted` because trace fixtures cannot promise exactly-once metric delivery.
 
+## Interoperability evidence
+
+`interop/agentgateway-v1.5.0.json` is a normalized runtime observation rather than a canonical conformance fixture. It records pinned container digests, synthetic request outcomes, stable span labels, bounded semantic fields, and implementation-specific attribute names. Raw trace and span identifiers are deliberately omitted.
+
 ## Privacy
 
 Fixtures contain model aliases, provider aliases, deterministic durations, error categories, and token counts. Prompt content, generated content, credentials, authorization values, and raw request URLs are outside the schema.
