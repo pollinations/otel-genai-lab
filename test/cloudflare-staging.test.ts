@@ -11,7 +11,9 @@ import {
   successAttributes,
 } from "../staging/cloudflare/src/policy.js";
 import {
+  isPreviewRequest,
   previewDocument,
+  previewHeadResponse,
   previewResponse,
 } from "../staging/cloudflare/src/preview.js";
 
@@ -86,6 +88,14 @@ describe("Cloudflare staging policy", () => {
 });
 
 describe("Cloudflare staging preview", () => {
+  it("serves the root for browser GET and HEAD requests only", () => {
+    expect(isPreviewRequest("GET", "/")).toBe(true);
+    expect(isPreviewRequest("HEAD", "/")).toBe(true);
+    expect(isPreviewRequest("POST", "/")).toBe(false);
+    expect(isPreviewRequest("GET", "/scenario/direct")).toBe(false);
+    expect(previewHeadResponse().body).toBeNull();
+  });
+
   it("offers only the three bounded synthetic scenarios", () => {
     expect(previewDocument).toContain(
       'const scenarios = ["direct", "fallback", "detached"]',

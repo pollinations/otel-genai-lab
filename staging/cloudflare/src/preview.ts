@@ -10,6 +10,14 @@ export function previewResponse(): Response {
   return new Response(previewDocument, { headers: previewHeaders });
 }
 
+export function isPreviewRequest(method: string, pathname: string): boolean {
+  return (method === "GET" || method === "HEAD") && pathname === "/";
+}
+
+export function previewHeadResponse(): Response {
+  return new Response(null, { headers: previewHeaders });
+}
+
 export const previewDocument = `<!doctype html>
 <html lang="en">
   <head>
