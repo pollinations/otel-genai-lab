@@ -1,15 +1,24 @@
 {
-  "name": "@pollinations/otel-genai-lab",
+  "name": "otel-genai-lab",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "Deterministic reference lab for OpenTelemetry traces from GenAI gateways",
+  "bin": {
+    "otel-genai-lab": "dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=24.21.0 <25"
   },
   "packageManager": "npm@11.19.0",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "cli": "tsx src/bin.ts",
     "check": "npm run format:check && npm run typecheck && npm test && npm run traces:check && npm run traces:validate && npm run staging:check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -23,7 +32,8 @@
     "staging:typecheck": "tsc -p staging/cloudflare/tsconfig.json",
     "staging:check": "npm run staging:typecheck && wrangler deploy --dry-run --config staging/cloudflare/wrangler.jsonc",
     "staging:dev": "wrangler dev --config staging/cloudflare/wrangler.jsonc",
-    "staging:smoke": "tsx scripts/cloudflare-smoke.ts"
+    "staging:smoke": "tsx scripts/cloudflare-smoke.ts",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.1",
