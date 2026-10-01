@@ -2,6 +2,8 @@
 
 This isolated Worker reproduces direct success, fallback success, and one Durable Object alarm path without calling a model API. It enables native Workers tracing at 100% sampling because the smoke test sends only three controlled requests. Logs are disabled, and the handler never reads inbound request content.
 
+Cloudflare's persisted native trace events can still contain platform-captured request and network metadata, including client IP headers, user agent, and IP-derived location fields. Use only controlled staging traffic, do not send authorization headers or personal content, and remove or disable the experiment after evidence collection.
+
 The harness uses current native custom spans from `cloudflare:workers`. Provider calls are synthetic self-subrequests so the trace includes outbound fetch spans without credentials or paid inference.
 
 The Worker root serves a small, responsive control surface for running the same bounded scenarios from a browser. It has no content fields, external assets, analytics, or third-party requests. A restrictive Content Security Policy limits connections to the Worker itself.
