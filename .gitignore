@@ -1,8 +1,7 @@
 node_modules/
 dist/
 coverage/
-.env
-.env.*
+.env.local
 !.env.example
 *.log
 .issue-drafts/
