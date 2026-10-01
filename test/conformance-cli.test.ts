@@ -108,7 +108,11 @@ describe("conformance CLI", () => {
       safetyIssues: 0,
     });
     expect(report.traces[0].spans[0]).toEqual(
-      expect.objectContaining({ span: "span-1", kind: expect.any(String) }),
+      expect.objectContaining({
+        span: "span-1",
+        kind: expect.any(String),
+        outcome: {},
+      }),
     );
     expect(output).not.toMatch(/[a-f0-9]{32}/);
   });
@@ -121,6 +125,8 @@ describe("cross-gateway inspection", () => {
         kind: 3,
         attributes: {
           "gen_ai.operation.name": "chat",
+          "http.status": 503,
+          "agentgateway.outbound.kind": "Primary",
           "http.request.header.authorization": "Bearer abcdefghijklmnop",
         },
       }),
@@ -134,6 +140,12 @@ describe("cross-gateway inspection", () => {
     });
     expect(report.safetyIssues.every(({ code }) => code === "privacy")).toBe(
       true,
+    );
+    expect(report.traces[0]?.spans[0]).toEqual(
+      expect.objectContaining({
+        outcome: { "http.status": 503 },
+        implementationAttributes: ["agentgateway.outbound.kind"],
+      }),
     );
   });
 });

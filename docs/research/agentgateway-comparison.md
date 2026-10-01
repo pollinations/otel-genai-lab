@@ -73,7 +73,7 @@ Cache hits, caller deduplication, and detached execution form a second layer. Th
 
 Issue [#31](https://github.com/pollinations/otel-genai-lab/issues/31) adds an opt-in runtime harness for `ghcr.io/agentgateway/agentgateway:v1.5.0`. It uses a deterministic local OpenAI-compatible provider on Node.js `24.15.0-alpine`, exports OTLP/HTTP protobuf through Collector `0.161.0`, and retains Collector JSON only under the ignored `tmp/` directory. The Compose profile pins all three image indexes by digest.
 
-The harness sends one direct success and one deterministic provider error, with prompt and response capture disabled. The `inspect` command retains only the bounded GenAI operation, provider, model, and usage fields needed for comparison; it reports `agw.*` attribute names separately and applies the lab's privacy and attribute-safety checks. Runtime conclusions will be recorded here after the first reproducible capture rather than inferred from configuration.
+The harness sends one direct success and one deterministic provider error, with prompt and response capture disabled. The `inspect` command retains only the bounded GenAI operation, provider, model, usage, and HTTP outcome fields needed for comparison; it reports `agw.*` and `agentgateway.*` attribute names separately and applies the lab's privacy and attribute-safety checks. Runtime conclusions will be recorded here after the first reproducible capture rather than inferred from configuration.
 
 ## Consequences for implementation
 

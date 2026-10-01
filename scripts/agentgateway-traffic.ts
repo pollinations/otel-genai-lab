@@ -1,17 +1,21 @@
+import net from "node:net";
+
 const baseUrl = process.env.AGENTGATEWAY_BASE_URL ?? "http://127.0.0.1:13000";
 
 async function waitUntilReady(): Promise<void> {
+  const target = new URL(baseUrl);
+  const port = Number(target.port || (target.protocol === "https:" ? 443 : 80));
   for (let attempt = 0; attempt < 30; attempt += 1) {
     try {
-      const response = await fetch(`${baseUrl}/v1/chat/completions`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          model: "synthetic-success",
-          messages: [{ role: "user", content: "synthetic test input" }],
-        }),
+      await new Promise<void>((resolve, reject) => {
+        const socket = net.createConnection({ host: target.hostname, port });
+        socket.once("connect", () => {
+          socket.end();
+          resolve();
+        });
+        socket.once("error", reject);
       });
-      if (response.ok) return;
+      return;
     } catch {
       // The container may still be starting.
     }

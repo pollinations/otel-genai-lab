@@ -77,6 +77,11 @@ function formatInspectionReport(
       const details = Object.entries(span.genAi).map(
         ([name, value]) => `${name}=${JSON.stringify(value)}`,
       );
+      details.push(
+        ...Object.entries(span.outcome).map(
+          ([name, value]) => `${name}=${JSON.stringify(value)}`,
+        ),
+      );
       if (span.implementationAttributes.length > 0) {
         details.push(
           `implementation=${span.implementationAttributes.join(",")}`,

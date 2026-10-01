@@ -7,6 +7,7 @@ export interface InspectionSpan {
   kind: string;
   status: string;
   genAi: Record<string, OtlpAttributeValue>;
+  outcome: Record<string, OtlpAttributeValue>;
   implementationAttributes: string[];
 }
 
@@ -35,6 +36,12 @@ const retainedGenAiAttributes = new Set([
   "gen_ai.response.model",
   "gen_ai.usage.input_tokens",
   "gen_ai.usage.output_tokens",
+]);
+const retainedOutcomeAttributes = new Set([
+  "error.type",
+  "http.response.status_code",
+  "http.status",
+  "http.status_code",
 ]);
 
 export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
@@ -68,6 +75,11 @@ export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
               .filter(([name]) => retainedGenAiAttributes.has(name))
               .sort(([left], [right]) => left.localeCompare(right)),
           );
+          const outcome = Object.fromEntries(
+            Object.entries(span.attributes)
+              .filter(([name]) => retainedOutcomeAttributes.has(name))
+              .sort(([left], [right]) => left.localeCompare(right)),
+          );
           if (Object.keys(genAi).length > 0) genAiSpans += 1;
           return {
             span: `span-${spanIndex + 1}`,
@@ -75,8 +87,12 @@ export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
             kind: formatKind(span.kind),
             status: formatStatus(span.statusCode),
             genAi,
+            outcome,
             implementationAttributes: Object.keys(span.attributes)
-              .filter((name) => name.startsWith("agw."))
+              .filter(
+                (name) =>
+                  name.startsWith("agw.") || name.startsWith("agentgateway."),
+              )
               .sort(),
           };
         }),
