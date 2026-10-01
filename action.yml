@@ -26,7 +26,7 @@ inputs:
 outputs:
   report:
     description: Workspace-relative path to the generated report.
-    value: ${{ steps.validate.outputs.report }}
+    value: ${{ inputs.report }}
 
 runs:
   using: composite
@@ -35,8 +35,6 @@ runs:
       uses: actions/setup-node@v7
       with:
         node-version: ${{ inputs.node-version }}
-        cache: npm
-        cache-dependency-path: ${{ github.action_path }}/package-lock.json
 
     - name: Build validator
       shell: bash
@@ -47,7 +45,6 @@ runs:
         npm run build --prefix "$ACTION_PATH"
 
     - name: Validate traces
-      id: validate
       shell: bash
       env:
         ACTION_PATH: ${{ github.action_path }}
@@ -55,5 +52,4 @@ runs:
         REPORT_PATH: ${{ inputs.report }}
         REPORT_FORMAT: ${{ inputs.format }}
       run: |
-        echo "report=$REPORT_PATH" >> "$GITHUB_OUTPUT"
         "$ACTION_PATH/scripts/run-conformance-action.sh"
