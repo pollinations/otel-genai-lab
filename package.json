@@ -40,6 +40,8 @@
     "traces:check": "tsx scripts/generate-traces.ts --check && tsx scripts/generate-extended-traces.ts --check",
     "traces:export": "tsx scripts/export-traces.ts",
     "traces:validate": "tsx scripts/validate-traces.ts",
+    "interop:agentgateway": "bash scripts/run-agentgateway-interop.sh",
+    "interop:agentgateway:traffic": "tsx scripts/agentgateway-traffic.ts",
     "staging:typecheck": "tsc -p staging/cloudflare/tsconfig.json",
     "staging:check": "npm run staging:typecheck && wrangler deploy --dry-run --config staging/cloudflare/wrangler.jsonc",
     "staging:dev": "wrangler dev --config staging/cloudflare/wrangler.jsonc",

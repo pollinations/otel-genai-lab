@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { runCli } from "../src/cli.js";
 import { validateOtlpSpans } from "../src/conformance.js";
+import { inspectOtlpSpans } from "../src/inspection.js";
 import { readOtlpFile, type OtlpSpan } from "../src/otlp.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -87,6 +88,65 @@ describe("conformance CLI", () => {
         stderr: (message) => stderr.push(message),
       }),
     ).toBe(2);
+  });
+
+  it("inspects cross-gateway traces without exposing identifiers", () => {
+    const stdout: string[] = [];
+    const filename = path.join(root, "test/fixtures/otlp-traces.json");
+    expect(
+      runCli(["inspect", filename, "--format", "json"], {
+        stdout: (message) => stdout.push(message),
+        stderr: () => undefined,
+      }),
+    ).toBe(0);
+    const output = stdout[0] ?? "";
+    const report = JSON.parse(output);
+    expect(report.summary).toEqual({
+      traces: 3,
+      spans: 8,
+      genAiSpans: 5,
+      safetyIssues: 0,
+    });
+    expect(report.traces[0].spans[0]).toEqual(
+      expect.objectContaining({
+        span: "span-1",
+        kind: expect.any(String),
+        outcome: {},
+      }),
+    );
+    expect(output).not.toMatch(/[a-f0-9]{32}/);
+  });
+});
+
+describe("cross-gateway inspection", () => {
+  it("reports safety issues without applying topology requirements", () => {
+    const report = inspectOtlpSpans([
+      span({
+        kind: 3,
+        attributes: {
+          "gen_ai.operation.name": "chat",
+          "http.status": 503,
+          "agentgateway.outbound.kind": "Primary",
+          "http.request.header.authorization": "Bearer abcdefghijklmnop",
+        },
+      }),
+    ]);
+    expect(report.status).toBe("fail");
+    expect(report.summary).toEqual({
+      traces: 1,
+      spans: 1,
+      genAiSpans: 1,
+      safetyIssues: 2,
+    });
+    expect(report.safetyIssues.every(({ code }) => code === "privacy")).toBe(
+      true,
+    );
+    expect(report.traces[0]?.spans[0]).toEqual(
+      expect.objectContaining({
+        outcome: { "http.status": 503 },
+        implementationAttributes: ["agentgateway.outbound.kind"],
+      }),
+    );
   });
 });
 

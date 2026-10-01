@@ -77,6 +77,22 @@ steps:
 
 The action builds the checked-out validator, emits the same deterministic text or JSON report as the CLI, and preserves its exit codes. Trace and report paths must remain inside `GITHUB_WORKSPACE`.
 
+## Cross-gateway runtime evidence
+
+The opt-in agentgateway harness runs pinned agentgateway v1.5.0 against a local synthetic OpenAI-compatible provider and exports OTLP through the pinned Collector. It uses no provider or observability credentials and keeps prompt and response capture disabled.
+
+With Docker running, execute the complete direct-success and provider-error check:
+
+```sh
+npm run interop:agentgateway
+```
+
+The command writes the ignored `tmp/otel/agentgateway-traces.json`, prints a stable inspection report, checks retained attributes for unsafe content, and removes the three interop containers. `inspect` reports observed cross-gateway topology without claiming that another gateway conforms to this project's experimental Pollinations topology:
+
+```sh
+npm run cli -- inspect tmp/otel/agentgateway-traces.json --format json
+```
+
 ## License
 
 [MIT](LICENSE)
