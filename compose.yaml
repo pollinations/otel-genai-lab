@@ -8,3 +8,45 @@ services:
     volumes:
       - ./otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
       - ./tmp/otel:/var/lib/otel
+
+  agentgateway-collector:
+    profiles: ["agentgateway"]
+    image: otel/opentelemetry-collector-contrib:0.161.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./interop/agentgateway/collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+      - ./tmp/otel:/var/lib/otel
+
+  agentgateway-provider:
+    profiles: ["agentgateway"]
+    image: node:24.21.0-alpine3.22
+    command: ["node", "/fixture/provider.mjs"]
+    volumes:
+      - ./interop/agentgateway/provider.mjs:/fixture/provider.mjs:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8080/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  agentgateway:
+    profiles: ["agentgateway"]
+    image: ghcr.io/agentgateway/agentgateway:v1.5.0
+    command: ["-f", "/interop/config.yaml"]
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: http/protobuf
+    volumes:
+      - ./interop/agentgateway/config.yaml:/interop/config.yaml:ro
+    ports:
+      - "127.0.0.1:13000:3000"
+    depends_on:
+      agentgateway-provider:
+        condition: service_healthy
+      agentgateway-collector:
+        condition: service_started

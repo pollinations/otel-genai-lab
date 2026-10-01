@@ -1,0 +1,17 @@
+# Pinned runtime target: ghcr.io/agentgateway/agentgateway:v1.5.0
+config:
+  tracing:
+    otlpEndpoint: http://agentgateway-collector:4318/v1/traces
+    randomSampling: true
+    fields:
+      # Prompt and response capture is intentionally disabled.
+      add: {}
+
+llm:
+  port: 3000
+  models:
+    - name: "*"
+      provider: openAI
+      params:
+        baseUrl: http://agentgateway-provider:8080/v1
+        apiKey: synthetic-test-key
