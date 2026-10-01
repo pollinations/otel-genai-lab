@@ -1,0 +1,31 @@
+name: OTLP conformance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate canonical OTLP export
+        id: conformance
+        uses: ./
+        with:
+          traces: test/fixtures/otlp-traces.json
+          report: tmp/ci/otel-genai-report.json
+          format: json
+      - name: Upload conformance report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: otel-genai-conformance-report
+          path: ${{ steps.conformance.outputs.report }}
+          if-no-files-found: error
+          retention-days: 14

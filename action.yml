@@ -1,0 +1,59 @@
+name: Validate GenAI gateway traces
+description: Validate OTLP/JSON traces for gateway topology, usage, attribute, and privacy problems.
+author: Pollinations
+
+branding:
+  color: purple
+  icon: activity
+
+inputs:
+  traces:
+    description: Path to an OTLP/JSON Collector export, relative to the workspace.
+    required: true
+  report:
+    description: Path for the validation report, relative to the workspace.
+    required: false
+    default: otel-genai-report.json
+  format:
+    description: Report format, either json or text.
+    required: false
+    default: json
+  node-version:
+    description: Node.js version used to build and run the validator.
+    required: false
+    default: 24.21.0
+
+outputs:
+  report:
+    description: Workspace-relative path to the generated report.
+    value: ${{ steps.validate.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ github.action_path }}/package-lock.json
+
+    - name: Build validator
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        npm ci --ignore-scripts --prefix "$ACTION_PATH"
+        npm run build --prefix "$ACTION_PATH"
+
+    - name: Validate traces
+      id: validate
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        TRACE_PATH: ${{ inputs.traces }}
+        REPORT_PATH: ${{ inputs.report }}
+        REPORT_FORMAT: ${{ inputs.format }}
+      run: |
+        echo "report=$REPORT_PATH" >> "$GITHUB_OUTPUT"
+        "$ACTION_PATH/scripts/run-conformance-action.sh"
