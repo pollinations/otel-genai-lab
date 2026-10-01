@@ -11,7 +11,7 @@ services:
 
   agentgateway-collector:
     profiles: ["agentgateway"]
-    image: otel/opentelemetry-collector-contrib:0.161.0
+    image: otel/opentelemetry-collector-contrib:0.161.0@sha256:fd328de2552466ad78385e1b1289c3f2402b1c45f265b252aab1955b42845ac1
     command: ["--config=/etc/otelcol-contrib/config.yaml"]
     volumes:
       - ./interop/agentgateway/collector.yaml:/etc/otelcol-contrib/config.yaml:ro
@@ -19,7 +19,7 @@ services:
 
   agentgateway-provider:
     profiles: ["agentgateway"]
-    image: node:24.21.0-alpine3.22
+    image: node:24.15.0-alpine@sha256:d1b3b4da11eefd5941e7f0b9cf17783fc99d9c6fc34884a665f40a06dbdfc94f
     command: ["node", "/fixture/provider.mjs"]
     volumes:
       - ./interop/agentgateway/provider.mjs:/fixture/provider.mjs:ro
@@ -37,7 +37,7 @@ services:
 
   agentgateway:
     profiles: ["agentgateway"]
-    image: ghcr.io/agentgateway/agentgateway:v1.5.0
+    image: ghcr.io/agentgateway/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896
     command: ["-f", "/interop/config.yaml"]
     environment:
       OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: http/protobuf
