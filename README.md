@@ -34,6 +34,19 @@ npm run build
 
 The lab covers direct success, fallback, terminal failure, cache hits, concurrent deduplication, and detached completion. Start the pinned OpenTelemetry Collector with `docker compose up collector` when working on OTLP export; it accepts OTLP/gRPC on port 4317 and OTLP/HTTP on port 4318.
 
+## Trace validator
+
+Validate an OpenTelemetry Collector JSON file export locally:
+
+```sh
+npm run cli -- validate tmp/otel/traces.json
+npm run cli -- validate tmp/otel/traces.json --format json
+```
+
+The command accepts an OTLP/JSON `resourceSpans` object, an array of those objects, or newline-delimited Collector batches. It returns exit code 0 for a clean file, 1 for conformance findings, and 2 for invalid input or command usage. Reports use stable labels such as `trace-1` and never print raw trace or span identifiers.
+
+The validator is experimental project tooling, not an official OpenTelemetry or CNCF conformance certification. The npm package has not been published yet; `npx otel-genai-lab` will work only after the first release is published.
+
 ## License
 
 [MIT](LICENSE)
