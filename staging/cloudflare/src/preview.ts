@@ -4,6 +4,7 @@ const previewHeaders = {
   "content-type": "text/html; charset=utf-8",
   "referrer-policy": "no-referrer",
   "x-content-type-options": "nosniff",
+  "x-robots-tag": "noindex, nofollow, noarchive",
 };
 
 export function previewResponse(): Response {
@@ -24,6 +25,7 @@ export const previewDocument = `<!doctype html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
+    <meta name="robots" content="noindex, nofollow, noarchive">
     <title>OTel GenAI Lab · Staging</title>
     <style>
       :root {
@@ -89,7 +91,7 @@ export const previewDocument = `<!doctype html>
         <div class="eyebrow">Pollinations · CNCF observability experiment</div>
         <h1>See a GenAI request become a trace.</h1>
         <p class="lede">Run three bounded scenarios that test direct inference, provider fallback, and detached completion across a Durable Object alarm.</p>
-        <div class="notice"><strong>Synthetic only</strong><span>No model is called. No prompt, response, request body, credential, or personal data is collected by this harness.</span></div>
+        <div class="notice"><strong>Synthetic only</strong><span>No model is called, and this harness does not read prompts, responses, request bodies, or credentials. Cloudflare native tracing can retain request and network metadata, including IP addresses and user agents. Use controlled staging traffic only.</span></div>
       </header>
       <section aria-labelledby="controls-title">
         <h2 id="controls-title" class="eyebrow">Scenario controls</h2>
