@@ -1,9 +1,20 @@
 {
-  "name": "otel-genai-lab",
+  "name": "@elixpo/otel-genai-lab",
   "version": "0.1.0",
   "private": false,
   "type": "module",
   "description": "Deterministic reference lab for OpenTelemetry traces from GenAI gateways",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pollinations/otel-genai-lab.git"
+  },
+  "homepage": "https://github.com/pollinations/otel-genai-lab#readme",
+  "bugs": {
+    "url": "https://github.com/pollinations/otel-genai-lab/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "otel-genai-lab": "dist/bin.js"
   },

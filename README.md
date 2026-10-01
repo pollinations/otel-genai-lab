@@ -45,7 +45,37 @@ npm run cli -- validate tmp/otel/traces.json --format json
 
 The command accepts an OTLP/JSON `resourceSpans` object, an array of those objects, or newline-delimited Collector batches. It returns exit code 0 for a clean file, 1 for conformance findings, and 2 for invalid input or command usage. Reports use stable labels such as `trace-1` and never print raw trace or span identifiers.
 
-The validator is experimental project tooling, not an official OpenTelemetry or CNCF conformance certification. The npm package has not been published yet; `npx otel-genai-lab` will work only after the first release is published.
+The validator is experimental project tooling, not an official OpenTelemetry or CNCF conformance certification. The npm package has not been published yet; after the first release, run it with:
+
+```sh
+npx @elixpo/otel-genai-lab validate traces.json
+```
+
+### GitHub Action
+
+The repository also exposes a composite action. Until a stable tag is published, pin it to a commit SHA or `main` while evaluating it:
+
+```yaml
+permissions:
+  contents: read
+
+steps:
+  - uses: actions/checkout@v7
+  - name: Validate GenAI gateway traces
+    id: otel-genai
+    uses: pollinations/otel-genai-lab@main
+    with:
+      traces: artifacts/traces.json
+      report: artifacts/otel-genai-report.json
+  - name: Upload trace report
+    if: ${{ always() }}
+    uses: actions/upload-artifact@v6
+    with:
+      name: otel-genai-report
+      path: ${{ steps.otel-genai.outputs.report }}
+```
+
+The action builds the checked-out validator, emits the same deterministic text or JSON report as the CLI, and preserves its exit codes. Trace and report paths must remain inside `GITHUB_WORKSPACE`.
 
 ## License
 
