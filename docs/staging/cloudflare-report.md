@@ -26,6 +26,16 @@ This report records the bounded experiment from `staging/cloudflare`. Do not add
 
 These client durations confirm route behavior only. They are not instrumentation overhead measurements and cannot replace the platform wall-time and CPU-time review below.
 
+### Preview deployment revalidation
+
+The browser preview from PR #22 was deployed on 2026-10-01 as Cloudflare version `ec0c1d7f-ec33-40f3-9e41-540cd804f6f7`. A GET request returned the expected HTML with its restrictive Content Security Policy. The bounded smoke run completed at 15:58:45 UTC:
+
+| Scenario             | HTTP status | Client duration | Response              |
+| -------------------- | ----------- | --------------- | --------------------- |
+| Direct success       | 200         | 252.05 ms       | `success`, 1 attempt  |
+| Fallback success     | 200         | 58.55 ms        | `success`, 2 attempts |
+| Durable Object alarm | 202         | 649.17 ms       | `scheduled`           |
+
 ## Scenario evidence
 
 | Scenario             | Native spans observed | Custom spans observed | Portable-model match | Sensitive-field scan | Notes |
