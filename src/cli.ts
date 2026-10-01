@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import { validateOtlpSpans, type ConformanceReport } from "./conformance.js";
+import { inspectOtlpSpans, type InspectionReport } from "./inspection.js";
 import { readOtlpFile } from "./otlp.js";
 
 interface CliIo {
@@ -18,7 +19,11 @@ export function runCli(args: readonly string[], io: CliIo = defaultIo): number {
     io.stdout(helpText());
     return 0;
   }
-  if (args[0] !== "validate" || args[1] === undefined) {
+  const command = args[0];
+  if (
+    (command !== "validate" && command !== "inspect") ||
+    args[1] === undefined
+  ) {
     io.stderr(helpText());
     return 2;
   }
@@ -31,14 +36,24 @@ export function runCli(args: readonly string[], io: CliIo = defaultIo): number {
   }
 
   try {
-    const report = validateOtlpSpans(readOtlpFile(filename));
-    if (formatResult === "json") {
+    const input = path.basename(filename);
+    const spans = readOtlpFile(filename);
+    if (command === "validate") {
+      const report = validateOtlpSpans(spans);
       io.stdout(
-        JSON.stringify({ input: path.basename(filename), ...report }, null, 2),
+        formatResult === "json"
+          ? JSON.stringify({ input, ...report }, null, 2)
+          : formatTextReport(input, report),
       );
-    } else {
-      io.stdout(formatTextReport(path.basename(filename), report));
+      return report.status === "pass" ? 0 : 1;
     }
+
+    const report = inspectOtlpSpans(spans);
+    io.stdout(
+      formatResult === "json"
+        ? JSON.stringify({ input, ...report }, null, 2)
+        : formatInspectionReport(input, report),
+    );
     return report.status === "pass" ? 0 : 1;
   } catch (error) {
     io.stderr(
@@ -46,6 +61,38 @@ export function runCli(args: readonly string[], io: CliIo = defaultIo): number {
     );
     return 2;
   }
+}
+
+function formatInspectionReport(
+  input: string,
+  report: InspectionReport,
+): string {
+  const { traces, spans, genAiSpans, safetyIssues } = report.summary;
+  const lines = [
+    `${report.status.toUpperCase()} ${input}: ${traces} trace(s), ${spans} span(s), ${genAiSpans} GenAI span(s), ${safetyIssues} safety issue(s)`,
+  ];
+  for (const trace of report.traces) {
+    lines.push(`  ${trace.trace}: ${trace.spans.length} span(s)`);
+    for (const span of trace.spans) {
+      const details = Object.entries(span.genAi).map(
+        ([name, value]) => `${name}=${JSON.stringify(value)}`,
+      );
+      if (span.implementationAttributes.length > 0) {
+        details.push(
+          `implementation=${span.implementationAttributes.join(",")}`,
+        );
+      }
+      lines.push(
+        `    ${span.span}: ${span.kind} ${span.status} ${span.name}${details.length > 0 ? ` [${details.join("; ")}]` : ""}`,
+      );
+    }
+  }
+  for (const issue of report.safetyIssues) {
+    lines.push(
+      `  [${issue.code}] ${issue.trace}.${issue.span}.${issue.field}: ${issue.message}`,
+    );
+  }
+  return lines.join("\n");
 }
 
 function readFormat(
@@ -83,8 +130,11 @@ function formatTextReport(input: string, report: ConformanceReport): string {
 function helpText(): string {
   return [
     "Usage: otel-genai-lab validate <traces.json> [--format text|json]",
+    "       otel-genai-lab inspect <traces.json> [--format text|json]",
     "",
     "Validates OTLP/JSON Collector trace exports against the experimental",
     "GenAI gateway topology, usage, attribute-safety, and privacy policy.",
+    "Inspect reports cross-gateway topology and retained safe fields without",
+    "requiring the input to match the experimental topology.",
   ].join("\n");
 }

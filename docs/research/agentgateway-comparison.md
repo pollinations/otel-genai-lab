@@ -69,6 +69,12 @@ The shared, portable core is synchronous multi-provider execution:
 
 Cache hits, caller deduplication, and detached execution form a second layer. They are valuable Pollinations cases and relevant to OpenTelemetry discussions, but they cannot yet be claimed as universal gateway behavior.
 
+## Runtime evidence method
+
+Issue [#31](https://github.com/pollinations/otel-genai-lab/issues/31) adds an opt-in runtime harness for `ghcr.io/agentgateway/agentgateway:v1.5.0`. It uses a deterministic local OpenAI-compatible provider, exports OTLP/HTTP protobuf through Collector `0.161.0`, and retains Collector JSON only under the ignored `tmp/` directory.
+
+The harness sends one direct success and one deterministic provider error, with prompt and response capture disabled. The `inspect` command retains only the bounded GenAI operation, provider, model, and usage fields needed for comparison; it reports `agw.*` attribute names separately and applies the lab's privacy and attribute-safety checks. Runtime conclusions will be recorded here after the first reproducible capture rather than inferred from configuration.
+
 ## Consequences for implementation
 
 1. Canonical fixtures start with direct success, fallback success, and terminal failure.
