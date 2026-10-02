@@ -83,6 +83,8 @@ Agentgateway v1.5.0 puts the standard GenAI operation, provider, model, and succ
 
 This confirms that the shared behavioral concepts exist but the emitted topology is not the lab's proposed one-GenAI-client-span-per-provider-attempt baseline. In particular, the direct and failed provider calls are visible, but attempt-level GenAI identity and usage are not attached to the client spans. A multi-provider fallback capture remains necessary to determine whether separate failed and successful HTTP client spans survive under one gateway server span.
 
+Issue [#33](https://github.com/pollinations/otel-genai-lab/issues/33) provides that follow-up as a separate Compose profile. It follows agentgateway v1.5.0's tested retry path: a `429` marks the primary provider unhealthy, one retry reselects the next priority group, and the synthetic fallback provider receives `x-retry-attempt: 1`. Runtime conclusions remain pending until the container capture is reproduced.
+
 ## Consequences for implementation
 
 1. Canonical fixtures start with direct success, fallback success, and terminal failure.

@@ -5,6 +5,7 @@ const usage = {
   completion_tokens: 4,
   total_tokens: 14,
 };
+const attempts = [];
 
 function reply(response, status, value) {
   const body = JSON.stringify(value);
@@ -19,6 +20,10 @@ http
   .createServer((request, response) => {
     if (request.method === "GET" && request.url === "/health") {
       reply(response, 200, { status: "ok" });
+      return;
+    }
+    if (request.method === "GET" && request.url === "/attempts") {
+      reply(response, 200, attempts);
       return;
     }
     if (request.method !== "POST" || request.url !== "/v1/chat/completions") {
@@ -40,8 +45,20 @@ http
         return;
       }
 
-      if (model === "synthetic-error") {
-        reply(response, 503, {
+      const status =
+        model === "synthetic-primary"
+          ? 429
+          : model === "synthetic-error"
+            ? 503
+            : 200;
+      attempts.push({
+        model,
+        retryAttempt: request.headers["x-retry-attempt"] ?? null,
+        status,
+      });
+
+      if (status !== 200) {
+        reply(response, status, {
           error: { message: "synthetic provider failure", type: "test_error" },
         });
         return;
@@ -50,7 +67,7 @@ http
       reply(response, 200, {
         id: "chatcmpl-synthetic",
         created: 1700000000,
-        model: "synthetic-success",
+        model,
         object: "chat.completion",
         usage,
         choices: [

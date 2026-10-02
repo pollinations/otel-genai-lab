@@ -11,6 +11,7 @@ export interface OtlpSpan {
   traceId: string;
   spanId: string;
   parentSpanId: string | null;
+  startTimeUnixNano: string | null;
   name: string;
   kind: number | string;
   statusCode: number | string;
@@ -70,6 +71,11 @@ function parseSpan(value: unknown): OtlpSpan {
     typeof value.parentSpanId === "string" && value.parentSpanId.length > 0
       ? value.parentSpanId
       : null;
+  const startTimeUnixNano =
+    typeof value.startTimeUnixNano === "string" &&
+    /^\d+$/.test(value.startTimeUnixNano)
+      ? value.startTimeUnixNano
+      : null;
   const kind =
     typeof value.kind === "number" || typeof value.kind === "string"
       ? value.kind
@@ -90,6 +96,7 @@ function parseSpan(value: unknown): OtlpSpan {
     traceId,
     spanId,
     parentSpanId,
+    startTimeUnixNano,
     name,
     kind,
     statusCode,

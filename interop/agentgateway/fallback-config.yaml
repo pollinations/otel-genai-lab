@@ -1,0 +1,50 @@
+# Pinned runtime target: ghcr.io/agentgateway/agentgateway:v1.5.0
+config:
+  tracing:
+    otlpEndpoint: http://agentgateway-fallback-collector:4318/v1/traces
+    randomSampling: true
+    fields:
+      # Prompt and response capture is intentionally disabled.
+      add: {}
+
+binds:
+  - port: 3000
+    listeners:
+      - name: llm-fallback
+        protocol: HTTP
+        routes:
+          - policies:
+              retry:
+                # Agentgateway treats this as one retry after the first attempt.
+                attempts: 1
+                backoff: 10ms
+                codes: [429]
+              ai:
+                routes:
+                  /v1/chat/completions: completions
+            backends:
+              - ai:
+                  name: synthetic-fallback
+                  groups:
+                    - providers:
+                        - name: primary
+                          hostOverride: agentgateway-provider:8080
+                          provider:
+                            openAI:
+                              model: synthetic-primary
+                          policies:
+                            backendAuth:
+                              key: synthetic-test-key
+                            health:
+                              unhealthyExpression: response.code == 429
+                              eviction:
+                                duration: 1s
+                    - providers:
+                        - name: fallback
+                          hostOverride: agentgateway-provider:8080
+                          provider:
+                            openAI:
+                              model: synthetic-fallback
+                          policies:
+                            backendAuth:
+                              key: synthetic-test-key

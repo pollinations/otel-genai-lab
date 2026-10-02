@@ -42,6 +42,7 @@ const retainedOutcomeAttributes = new Set([
   "http.response.status_code",
   "http.status",
   "http.status_code",
+  "retry.attempt",
 ]);
 
 export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
@@ -62,11 +63,17 @@ export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
   const traces = [...grouped.entries()]
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([, traceSpans], traceIndex): InspectionTrace => {
-      const sorted = [...traceSpans].sort((left, right) =>
-        [left.name, left.spanId]
-          .join("\0")
-          .localeCompare([right.name, right.spanId].join("\0")),
-      );
+      const sorted = [...traceSpans].sort((left, right) => {
+        const timeOrder = compareStartTime(
+          left.startTimeUnixNano,
+          right.startTimeUnixNano,
+        );
+        return timeOrder !== 0
+          ? timeOrder
+          : [left.name, left.spanId]
+              .join("\0")
+              .localeCompare([right.name, right.spanId].join("\0"));
+      });
       return {
         trace: `trace-${traceIndex + 1}`,
         spans: sorted.map((span, spanIndex) => {
@@ -111,6 +118,15 @@ export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
     traces,
     safetyIssues,
   };
+}
+
+function compareStartTime(left: string | null, right: string | null): number {
+  if (left === right) return 0;
+  if (left === null) return 1;
+  if (right === null) return -1;
+  return left.length === right.length
+    ? left.localeCompare(right)
+    : left.length - right.length;
 }
 
 function formatKind(kind: OtlpSpan["kind"]): string {
