@@ -6,7 +6,7 @@ The project starts with a question rather than a new convention:
 
 > How should an OpenTelemetry trace represent one server-side GenAI gateway operation and its provider attempts when routing, fallback, caching, deduplication, or detached execution occurs, while keeping latency and usage attribution accurate and excluding prompt and response content by default?
 
-Read the [project proposal](docs/project-proposal.md), [scenario contract](docs/scenarios.md), [experimental telemetry model](docs/telemetry-model.md), [extended scenarios](docs/extended-scenarios.md), [validation policy](docs/validation.md), [Cloudflare staging report](docs/staging/cloudflare-report.md), [agentgateway comparison](docs/research/agentgateway-comparison.md), and [project tracker](https://github.com/pollinations/otel-genai-lab/issues/10).
+Read the [project proposal](docs/project-proposal.md), [scenario contract](docs/scenarios.md), [experimental telemetry model](docs/telemetry-model.md), [extended scenarios](docs/extended-scenarios.md), [validation policy](docs/validation.md), [Cloudflare staging report](docs/staging/cloudflare-report.md), [agentgateway comparison](docs/research/agentgateway-comparison.md), [Pollinations production recommendation](docs/pollinations-production-recommendation.md), and [project tracker](https://github.com/pollinations/otel-genai-lab/issues/10).
 
 ## Current phase
 
