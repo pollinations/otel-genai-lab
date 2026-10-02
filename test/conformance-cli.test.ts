@@ -112,6 +112,7 @@ describe("conformance CLI", () => {
         span: "span-1",
         kind: expect.any(String),
         outcome: {},
+        implementation: {},
       }),
     );
     expect(output).not.toMatch(/[a-f0-9]{32}/);
@@ -144,6 +145,7 @@ describe("cross-gateway inspection", () => {
     expect(report.traces[0]?.spans[0]).toEqual(
       expect.objectContaining({
         outcome: { "http.status": 503 },
+        implementation: { "agentgateway.outbound.kind": "Primary" },
         implementationAttributes: ["agentgateway.outbound.kind"],
       }),
     );

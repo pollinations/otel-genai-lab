@@ -8,6 +8,7 @@ export interface InspectionSpan {
   status: string;
   genAi: Record<string, OtlpAttributeValue>;
   outcome: Record<string, OtlpAttributeValue>;
+  implementation: Record<string, OtlpAttributeValue>;
   implementationAttributes: string[];
 }
 
@@ -43,6 +44,10 @@ const retainedOutcomeAttributes = new Set([
   "http.status",
   "http.status_code",
   "retry.attempt",
+]);
+const retainedImplementationAttributes = new Set([
+  "agentgateway.outbound.kind",
+  "agentgateway.outbound.subtype",
 ]);
 
 export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
@@ -87,6 +92,11 @@ export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
               .filter(([name]) => retainedOutcomeAttributes.has(name))
               .sort(([left], [right]) => left.localeCompare(right)),
           );
+          const implementation = Object.fromEntries(
+            Object.entries(span.attributes)
+              .filter(([name]) => retainedImplementationAttributes.has(name))
+              .sort(([left], [right]) => left.localeCompare(right)),
+          );
           if (Object.keys(genAi).length > 0) genAiSpans += 1;
           return {
             span: `span-${spanIndex + 1}`,
@@ -95,6 +105,7 @@ export function inspectOtlpSpans(spans: readonly OtlpSpan[]): InspectionReport {
             status: formatStatus(span.statusCode),
             genAi,
             outcome,
+            implementation,
             implementationAttributes: Object.keys(span.attributes)
               .filter(
                 (name) =>

@@ -24,7 +24,6 @@ binds:
                   /v1/chat/completions: completions
             backends:
               - ai:
-                  name: synthetic-fallback
                   groups:
                     - providers:
                         - name: primary

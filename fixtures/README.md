@@ -22,7 +22,7 @@ Run `npm run fixtures:check` to validate the schema and execute every fixture.
 
 ## Interoperability evidence
 
-`interop/agentgateway-v1.5.0.json` is a normalized runtime observation rather than a canonical conformance fixture. It records pinned container digests, synthetic request outcomes, stable span labels, bounded semantic fields, and implementation-specific attribute names. Raw trace and span identifiers are deliberately omitted.
+`interop/agentgateway-v1.5.0.json` and `interop/agentgateway-v1.5.0-fallback.json` are normalized runtime observations rather than canonical conformance fixtures. They record pinned container digests, synthetic request outcomes, stable span labels, bounded semantic fields, and implementation-specific attributes. Raw trace and span identifiers are deliberately omitted.
 
 ## Privacy
 
