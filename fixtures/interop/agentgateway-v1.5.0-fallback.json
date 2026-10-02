@@ -1,22 +1,33 @@
 {
   "evidenceVersion": "0.1.0",
-  "capturedOn": "2026-10-01",
+  "capturedOn": "2026-10-02",
   "runtime": {
     "agentgateway": "ghcr.io/agentgateway/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896",
     "collector": "otel/opentelemetry-collector-contrib:0.161.0@sha256:fd328de2552466ad78385e1b1289c3f2402b1c45f265b252aab1955b42845ac1",
     "provider": "node:24.15.0-alpine@sha256:d1b3b4da11eefd5941e7f0b9cf17783fc99d9c6fc34884a665f40a06dbdfc94f"
   },
   "traffic": {
-    "direct": 200,
-    "failure": 503
+    "result": 200,
+    "attempts": [
+      {
+        "model": "synthetic-primary",
+        "retryAttempt": null,
+        "status": 429
+      },
+      {
+        "model": "synthetic-fallback",
+        "retryAttempt": "1",
+        "status": 200
+      }
+    ]
   },
   "inspection": {
     "schemaVersion": "0.1.0",
     "status": "pass",
     "summary": {
-      "traces": 2,
-      "spans": 4,
-      "genAiSpans": 2,
+      "traces": 1,
+      "spans": 3,
+      "genAiSpans": 1,
       "safetyIssues": 0
     },
     "traces": [
@@ -31,10 +42,14 @@
             "genAi": {
               "gen_ai.operation.name": "chat",
               "gen_ai.provider.name": "openai",
-              "gen_ai.request.model": "synthetic-error"
+              "gen_ai.request.model": "synthetic-fallback",
+              "gen_ai.response.model": "synthetic-fallback",
+              "gen_ai.usage.input_tokens": 10,
+              "gen_ai.usage.output_tokens": 4
             },
             "outcome": {
-              "http.status": 503
+              "http.status": 200,
+              "retry.attempt": 1
             },
             "implementation": {},
             "implementationAttributes": []
@@ -46,7 +61,7 @@
             "status": "UNSET",
             "genAi": {},
             "outcome": {
-              "http.status": 503
+              "http.status": 429
             },
             "implementation": {
               "agentgateway.outbound.kind": "Primary",
@@ -56,33 +71,9 @@
               "agentgateway.outbound.kind",
               "agentgateway.outbound.subtype"
             ]
-          }
-        ]
-      },
-      {
-        "trace": "trace-2",
-        "spans": [
-          {
-            "span": "span-1",
-            "name": "POST /*",
-            "kind": "SERVER",
-            "status": "UNSET",
-            "genAi": {
-              "gen_ai.operation.name": "chat",
-              "gen_ai.provider.name": "openai",
-              "gen_ai.request.model": "synthetic-success",
-              "gen_ai.response.model": "synthetic-success",
-              "gen_ai.usage.input_tokens": 10,
-              "gen_ai.usage.output_tokens": 4
-            },
-            "outcome": {
-              "http.status": 200
-            },
-            "implementation": {},
-            "implementationAttributes": []
           },
           {
-            "span": "span-2",
+            "span": "span-3",
             "name": "POST agentgateway-provider:8080",
             "kind": "CLIENT",
             "status": "UNSET",

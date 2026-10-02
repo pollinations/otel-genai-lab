@@ -112,6 +112,7 @@ describe("conformance CLI", () => {
         span: "span-1",
         kind: expect.any(String),
         outcome: {},
+        implementation: {},
       }),
     );
     expect(output).not.toMatch(/[a-f0-9]{32}/);
@@ -144,9 +145,32 @@ describe("cross-gateway inspection", () => {
     expect(report.traces[0]?.spans[0]).toEqual(
       expect.objectContaining({
         outcome: { "http.status": 503 },
+        implementation: { "agentgateway.outbound.kind": "Primary" },
         implementationAttributes: ["agentgateway.outbound.kind"],
       }),
     );
+  });
+
+  it("labels spans in observed start order without retaining timestamps", () => {
+    const report = inspectOtlpSpans([
+      span({
+        spanId: "later",
+        startTimeUnixNano: "200",
+        name: "provider fallback",
+      }),
+      span({
+        spanId: "earlier",
+        startTimeUnixNano: "100",
+        name: "provider primary",
+      }),
+    ]);
+    expect(
+      report.traces[0]?.spans.map(({ span, name }) => ({ span, name })),
+    ).toEqual([
+      { span: "span-1", name: "provider primary" },
+      { span: "span-2", name: "provider fallback" },
+    ]);
+    expect(JSON.stringify(report)).not.toContain("startTimeUnixNano");
   });
 });
 
@@ -155,6 +179,7 @@ function span(overrides: Partial<OtlpSpan>): OtlpSpan {
     traceId: "trace",
     spanId: "span",
     parentSpanId: null,
+    startTimeUnixNano: null,
     name: "span",
     kind: 0,
     statusCode: 0,

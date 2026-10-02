@@ -83,6 +83,14 @@ Agentgateway v1.5.0 puts the standard GenAI operation, provider, model, and succ
 
 This confirms that the shared behavioral concepts exist but the emitted topology is not the lab's proposed one-GenAI-client-span-per-provider-attempt baseline. In particular, the direct and failed provider calls are visible, but attempt-level GenAI identity and usage are not attached to the client spans. A multi-provider fallback capture remains necessary to determine whether separate failed and successful HTTP client spans survive under one gateway server span.
 
+Issue [#33](https://github.com/pollinations/otel-genai-lab/issues/33) provides that follow-up as a separate Compose profile. It follows agentgateway v1.5.0's tested retry path: a `429` marks the primary provider unhealthy, one retry reselects the next priority group, and the synthetic fallback provider receives `x-retry-attempt: 1`.
+
+The 2026-10-02 fallback capture produced one trace with one GenAI `SERVER` span and two ordered HTTP `CLIENT` spans. The normalized evidence is committed at [`fixtures/interop/agentgateway-v1.5.0-fallback.json`](../../fixtures/interop/agentgateway-v1.5.0-fallback.json).
+
+The first client span records `http.status=429`; the second records `http.status=200`. Both expose the same `agentgateway.outbound.kind=Primary` and `agentgateway.outbound.subtype=Llm`, with no provider or model identity, so chronology and outcome are the only retained fields that distinguish the attempts. The server span records `retry.attempt=1`, final model `synthetic-fallback`, and the successful provider's usage exactly once. It does not retain the caller's requested `synthetic-route` model in the standard request-model field. All three OpenTelemetry span statuses remain `UNSET`.
+
+This confirms that agentgateway preserves separate provider-call spans through fallback and avoids usage duplication. It also sharpens the portability gap: consumers can count and time attempts from HTTP client spans, but cannot attribute those spans to provider/model identities from standard GenAI fields in this release.
+
 ## Consequences for implementation
 
 1. Canonical fixtures start with direct success, fallback success, and terminal failure.

@@ -84,7 +84,9 @@ function formatInspectionReport(
       );
       if (span.implementationAttributes.length > 0) {
         details.push(
-          `implementation=${span.implementationAttributes.join(",")}`,
+          `implementation=${Object.entries(span.implementation)
+            .map(([name, value]) => `${name}=${JSON.stringify(value)}`)
+            .join(",")}`,
         );
       }
       lines.push(

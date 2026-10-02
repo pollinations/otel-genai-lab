@@ -93,6 +93,14 @@ The command writes the ignored `tmp/otel/agentgateway-traces.json`, prints a sta
 npm run cli -- inspect tmp/otel/agentgateway-traces.json --format json
 ```
 
+Exercise one logical request whose primary provider returns `429` and whose priority fallback succeeds:
+
+```sh
+npm run interop:agentgateway:fallback
+```
+
+This profile verifies the provider saw exactly two calls, including agentgateway's `x-retry-attempt: 1` marker on the fallback call, before inspecting `tmp/otel/agentgateway-fallback-traces.json`.
+
 ## License
 
 [MIT](LICENSE)
