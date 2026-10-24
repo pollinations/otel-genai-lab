@@ -48,7 +48,10 @@
     "staging:check": "npm run staging:typecheck && wrangler deploy --dry-run --config staging/cloudflare/wrangler.jsonc",
     "staging:dev": "wrangler dev --config staging/cloudflare/wrangler.jsonc",
     "staging:smoke": "tsx scripts/cloudflare-smoke.ts",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "slo:local": "tsx scripts/generate-slo-buckets.ts && npm run -s cli -- slo tmp/slo/local-buckets.json --target slo/targets/local.json || [ $? -eq 1 ]",
+    "slo:export:elixpo-blogs": "bash scripts/slo-export-elixpo-blogs.sh",
+    "slo:export:pollinations": "bash scripts/slo-export-pollinations.sh"
   },
   "dependencies": {
     "@opentelemetry/api": "1.9.1",

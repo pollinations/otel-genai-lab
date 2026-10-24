@@ -123,6 +123,26 @@ POLLINATIONS_DIR=~/pollinations bash scripts/slo-calibrate.sh
 
 The script reads `TINYBIRD_READ_TOKEN` from the environment, or decrypts it from the Pollinations production secrets with SOPS. It never prints the token.
 
+## Reference evaluator and data sources
+
+The lab ships a reference implementation of the burn-rate rules so they can be tested before the Tinybird implementation exists. Every data source is exported to the same five-minute bucket file of good and valid counts, and one evaluator (`npm run cli -- slo`) applies the target's objectives and the alert table above. It exits 0 when no alert fires, 1 when one does, and 2 for invalid input.
+
+| Target                                                | Source                                                                                                                   | View of Pollinations | Status                                              |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------- | --------------------------------------------------- |
+| [`pollinations`](../../slo/targets/pollinations.json) | Production Tinybird, [`pollinations-buckets.sql`](../../slo/sql/pollinations-buckets.sql)                                | Server side          | Ready; needs a read token. Objectives uncalibrated. |
+| [`elixpo-blogs`](../../slo/targets/elixpo-blogs.json) | blogs.elixpo D1 `pollinations_generation_attempts`, [`elixpo-blogs-buckets.sql`](../../slo/sql/elixpo-blogs-buckets.sql) | Client side, images  | Real traffic for testing. Objectives provisional.   |
+| [`local`](../../slo/targets/local.json)               | Deterministic synthetic incidents                                                                                        | Synthetic            | Used by tests.                                      |
+
+```sh
+npm run slo:local
+BLOGS_DIR=~/elixpo_projects/blogs.elixpo npm run slo:export:elixpo-blogs
+TINYBIRD_READ_TOKEN=... npm run slo:export:pollinations
+```
+
+The `elixpo-blogs` target is a real Pollinations client measuring Pollinations from outside, the same view the Phase 2 probe will provide. Its availability counts only Pollinations-attributable outcomes: completed attempts are good; 5xx responses and failures after the call started, such as timeouts, are bad; 4xx responses (pollen, permissions, revoked keys, rate limits), failures before the call started and unfinished attempts are excluded. Its provisional objectives exist to exercise the evaluator and are not Pollinations commitments.
+
+When an export covers less than the SLO window, as the default three-day Pollinations export does, `coverageMinutes` reports the covered span and the remaining budget assumes the measured burn continues for the rest of the window.
+
 ## Open questions for Pollinations maintainers
 
 1. Is there alerting outside the repository, such as Cloudflare notifications or a hosted Grafana alerting setup, that this would duplicate?
