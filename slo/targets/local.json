@@ -1,0 +1,60 @@
+{
+  "name": "local",
+  "description": "Synthetic incident buckets for deterministic tests of the burn-rate rules.",
+  "latencyThresholdsMs": {
+    "generate.text": 60000,
+    "generate.image": 60000
+  },
+  "slos": [
+    {
+      "id": "availability:generate.text",
+      "sli": "availability",
+      "eventType": "generate.text",
+      "objective": 0.995,
+      "windowDays": 30,
+      "minValid": 50
+    },
+    {
+      "id": "latency:generate.text",
+      "sli": "latency",
+      "eventType": "generate.text",
+      "objective": 0.95,
+      "windowDays": 30,
+      "minValid": 50
+    },
+    {
+      "id": "primary:generate.text",
+      "sli": "primary",
+      "eventType": "generate.text",
+      "perModel": true,
+      "objective": 0.99,
+      "windowDays": 7,
+      "minValid": 50
+    },
+    {
+      "id": "availability:generate.image",
+      "sli": "availability",
+      "eventType": "generate.image",
+      "objective": 0.995,
+      "windowDays": 30,
+      "minValid": 50
+    },
+    {
+      "id": "latency:generate.image",
+      "sli": "latency",
+      "eventType": "generate.image",
+      "objective": 0.95,
+      "windowDays": 30,
+      "minValid": 50
+    },
+    {
+      "id": "primary:generate.image",
+      "sli": "primary",
+      "eventType": "generate.image",
+      "perModel": true,
+      "objective": 0.99,
+      "windowDays": 7,
+      "minValid": 50
+    }
+  ]
+}

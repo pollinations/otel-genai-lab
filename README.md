@@ -77,6 +77,17 @@ steps:
 
 The action builds the checked-out validator, emits the same deterministic text or JSON report as the CLI, and preserves its exit codes. Trace and report paths must remain inside `GITHUB_WORKSPACE`.
 
+## SLO burn-rate evaluator
+
+Evaluate the [Pollinations SLOs](docs/slo/pollinations-slo-spec.md) over exported five-minute good/valid buckets:
+
+```sh
+npm run slo:local
+npm run cli -- slo tmp/slo/local-buckets.json --target slo/targets/local.json --format json
+```
+
+`slo:local` generates deterministic synthetic incidents and must report one page and one ticket. The `pollinations` and `elixpo-blogs` targets read real data through `npm run slo:export:pollinations` and `npm run slo:export:elixpo-blogs`; see the specification for what each needs.
+
 ## Cross-gateway runtime evidence
 
 The opt-in agentgateway harness runs pinned agentgateway v1.5.0 against a local synthetic OpenAI-compatible provider and exports OTLP through the pinned Collector. It uses no provider or observability credentials and keeps prompt and response capture disabled.

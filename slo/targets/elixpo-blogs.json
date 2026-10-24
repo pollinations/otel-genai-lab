@@ -1,0 +1,25 @@
+{
+  "name": "elixpo-blogs",
+  "description": "Client-side view of Pollinations image generation from blogs.elixpo (D1 pollinations_generation_attempts). Objectives are provisional test values, not Pollinations commitments.",
+  "latencyThresholdsMs": {
+    "generate.image": 60000
+  },
+  "slos": [
+    {
+      "id": "availability:generate.image",
+      "sli": "availability",
+      "eventType": "generate.image",
+      "objective": 0.99,
+      "windowDays": 30,
+      "minValid": 10
+    },
+    {
+      "id": "latency:generate.image",
+      "sli": "latency",
+      "eventType": "generate.image",
+      "objective": 0.95,
+      "windowDays": 30,
+      "minValid": 10
+    }
+  ]
+}

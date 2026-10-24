@@ -3,6 +3,8 @@ import path from "node:path";
 import { validateOtlpSpans, type ConformanceReport } from "./conformance.js";
 import { inspectOtlpSpans, type InspectionReport } from "./inspection.js";
 import { readOtlpFile } from "./otlp.js";
+import { evaluateSlos, type SloReport } from "./slo/evaluate.js";
+import { readBucketFile, readTargetConfig } from "./slo/model.js";
 
 interface CliIo {
   stdout: (message: string) => void;
@@ -20,6 +22,7 @@ export function runCli(args: readonly string[], io: CliIo = defaultIo): number {
     return 0;
   }
   const command = args[0];
+  if (command === "slo") return runSlo(args.slice(1), io);
   if (
     (command !== "validate" && command !== "inspect") ||
     args[1] === undefined
@@ -61,6 +64,82 @@ export function runCli(args: readonly string[], io: CliIo = defaultIo): number {
     );
     return 2;
   }
+}
+
+function runSlo(args: readonly string[], io: CliIo): number {
+  const filename = args[0];
+  let target: string | undefined;
+  let at: Date | undefined;
+  let format: "text" | "json" = "text";
+  for (let index = 1; index < args.length; index += 2) {
+    const flag = args[index];
+    const value = args[index + 1];
+    if (value === undefined) {
+      io.stderr(`${flag} needs a value`);
+      return 2;
+    }
+    if (flag === "--target") target = value;
+    else if (flag === "--at" && !Number.isNaN(Date.parse(value))) {
+      at = new Date(value);
+    } else if (flag === "--format" && (value === "text" || value === "json")) {
+      format = value;
+    } else {
+      io.stderr(`unexpected ${flag} ${value}`);
+      return 2;
+    }
+  }
+  if (filename === undefined || target === undefined) {
+    io.stderr(helpText());
+    return 2;
+  }
+
+  try {
+    const report = evaluateSlos(
+      readBucketFile(filename),
+      readTargetConfig(target),
+      at,
+    );
+    io.stdout(
+      format === "json"
+        ? JSON.stringify(report, null, 2)
+        : formatSloReport(path.basename(filename), report),
+    );
+    return report.status === "ok" ? 0 : 1;
+  } catch (error) {
+    io.stderr(
+      `${path.basename(filename)}: ${error instanceof Error ? error.message : "SLO evaluation failed"}`,
+    );
+    return 2;
+  }
+}
+
+function formatSloReport(input: string, report: SloReport): string {
+  const { slos, page, ticket } = report.summary;
+  const lines = [
+    `${report.status.toUpperCase()} ${input} (${report.target} at ${report.evaluatedAt}): ${slos} SLO(s), ${page} page, ${ticket} ticket`,
+  ];
+  for (const result of report.results) {
+    const name = result.model
+      ? `${result.slo} model=${result.model}`
+      : result.slo;
+    const details = [
+      `sli=${result.sliValue ?? "n/a"}`,
+      `objective=${result.objective ?? "uncalibrated"}`,
+      `valid=${result.valid}`,
+    ];
+    if (result.budgetRemaining !== null) {
+      details.push(`budget=${(result.budgetRemaining * 100).toFixed(1)}%`);
+    }
+    for (const alert of result.alerts.filter(({ firing }) => firing)) {
+      details.push(
+        `${alert.window} burn ${alert.longBurn}/${alert.shortBurn} >= ${alert.burnRate}`,
+      );
+    }
+    lines.push(
+      `  ${result.status.toUpperCase().padEnd(17)} ${name} [${details.join("; ")}]`,
+    );
+  }
+  return lines.join("\n");
 }
 
 function formatInspectionReport(
@@ -138,10 +217,12 @@ function helpText(): string {
   return [
     "Usage: otel-genai-lab validate <traces.json> [--format text|json]",
     "       otel-genai-lab inspect <traces.json> [--format text|json]",
+    "       otel-genai-lab slo <buckets.json> --target <target.json> [--at <iso>] [--format text|json]",
     "",
     "Validates OTLP/JSON Collector trace exports against the experimental",
     "GenAI gateway topology, usage, attribute-safety, and privacy policy.",
     "Inspect reports cross-gateway topology and retained safe fields without",
     "requiring the input to match the experimental topology.",
+    "Slo evaluates SLO burn-rate alerts over exported good/valid buckets.",
   ].join("\n");
 }
