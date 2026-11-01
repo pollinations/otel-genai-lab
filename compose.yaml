@@ -39,7 +39,7 @@ services:
 
   agentgateway:
     profiles: ["agentgateway"]
-    image: ghcr.io/agentgateway/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896
+    image: ghcr.io/agentgateway/agentgateway:v1.7.0@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b
     command: ["-f", "/interop/config.yaml"]
     environment:
       OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: http/protobuf
@@ -63,7 +63,7 @@ services:
 
   agentgateway-fallback:
     profiles: ["agentgateway-fallback"]
-    image: ghcr.io/agentgateway/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896
+    image: ghcr.io/agentgateway/agentgateway:v1.7.0@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b
     command: ["-f", "/interop/config.yaml"]
     environment:
       OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: http/protobuf
